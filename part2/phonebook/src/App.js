@@ -54,11 +54,25 @@ const Persons = ({ persons, handleDelete }) => {
   );
 };
 
+const Notification = ({ message, type }) => {
+  if (message === '') {
+    return null;
+  } else {
+    if (type === 'error') {
+      return <div className='notification error'>{message}</div>;
+    } else {
+      return <div className='notification'>{message}</div>;
+    }
+  }
+};
+
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [filter, setFilter] = useState('');
+  const [message, setMessage] = useState('');
+  const [type, setType] = useState('success');
 
   useEffect(() => {
     personService.getAll().then((data) => {
@@ -83,6 +97,10 @@ const App = () => {
           );
           setNewName('');
           setNewNumber('');
+          setMessage('Successfully changed number');
+          setTimeout(() => {
+            setMessage('');
+          }, 3000);
         });
       }
     } else {
@@ -94,6 +112,10 @@ const App = () => {
         setPersons(persons.concat(data));
         setNewName('');
         setNewNumber('');
+        setMessage('Successfully added');
+        setTimeout(() => {
+          setMessage('');
+        }, 3000);
       });
     }
   };
@@ -106,15 +128,28 @@ const App = () => {
     const personToDelete = persons.find((person) => person.id === id);
 
     if (window.confirm(`Delete ${personToDelete.name}?`)) {
-      personService.deleteOne(id).then(() => {
-        setPersons(persons.filter((person) => person.id !== id));
-      });
+      personService
+        .deleteOne(id)
+        .then(() => {
+          setPersons(persons.filter((person) => person.id !== id));
+        })
+        .catch((error) => {
+          setPersons(persons.filter((person) => person.id !== id));
+          setMessage(
+            `Information of ${personToDelete.name} has already been removed from server`
+          );
+          setType('error');
+          setTimeout(() => {
+            setMessage('');
+          }, 3000);
+        });
     }
   };
 
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification type={type} message={message} />
       <Filter
         value={filter}
         handleChange={(event) => setFilter(event.target.value)}
