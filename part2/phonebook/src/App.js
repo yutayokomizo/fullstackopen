@@ -71,8 +71,7 @@ const App = () => {
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [filter, setFilter] = useState('');
-  const [message, setMessage] = useState('');
-  const [type, setType] = useState('success');
+  const [message, setMessage] = useState({ content: '', type: 'success' });
 
   useEffect(() => {
     personService.getAll().then((data) => {
@@ -97,9 +96,15 @@ const App = () => {
           );
           setNewName('');
           setNewNumber('');
-          setMessage('Successfully changed number');
+          setMessage({
+            content: 'Successfully changed number',
+            type: 'success',
+          });
           setTimeout(() => {
-            setMessage('');
+            setMessage({
+              content: '',
+              type: 'success',
+            });
           }, 3000);
         });
       }
@@ -108,15 +113,23 @@ const App = () => {
         name: newName,
         number: newNumber,
       };
-      personService.create(newPerson).then((data) => {
-        setPersons(persons.concat(data));
-        setNewName('');
-        setNewNumber('');
-        setMessage('Successfully added');
-        setTimeout(() => {
-          setMessage('');
-        }, 3000);
-      });
+      personService
+        .create(newPerson)
+        .then((data) => {
+          setPersons(persons.concat(data));
+          setNewName('');
+          setNewNumber('');
+          setMessage({ content: 'Successfully added', type: 'success' });
+          setTimeout(() => {
+            setMessage({ content: '', type: 'success' });
+          }, 3000);
+        })
+        .catch((error) => {
+          setMessage({ content: error.response.data.error, type: 'error' });
+          setTimeout(() => {
+            setMessage({ content: '', type: 'error' });
+          }, 3000);
+        });
     }
   };
 
@@ -135,12 +148,12 @@ const App = () => {
         })
         .catch((error) => {
           setPersons(persons.filter((person) => person.id !== id));
-          setMessage(
-            `Information of ${personToDelete.name} has already been removed from server`
-          );
-          setType('error');
+          setMessage({
+            content: `Information of ${personToDelete.name} has already been removed from server`,
+            type: 'error',
+          });
           setTimeout(() => {
-            setMessage('');
+            setMessage({ content: '', type: 'success' });
           }, 3000);
         });
     }
@@ -149,7 +162,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification type={type} message={message} />
+      <Notification type={message.type} message={message.content} />
       <Filter
         value={filter}
         handleChange={(event) => setFilter(event.target.value)}
