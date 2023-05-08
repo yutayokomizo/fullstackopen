@@ -1,3 +1,7 @@
+const jwt = require('jsonwebtoken');
+
+const User = require('../models/user');
+
 const errorHandler = (error, request, response, next) => {
   if (error.name === 'ValidationError') {
     return response.status(400).json({ error: error.message });
@@ -23,4 +27,19 @@ const tokenExtractor = (request, response, next) => {
   next();
 };
 
-module.exports = { errorHandler, tokenExtractor };
+const userExtractor = async (request, response, next) => {
+  const tokenData = jwt.verify(request.token, process.env.SECRET);
+  if (!tokenData.id) {
+    return response.status(401).json({ error: 'Invalid token' });
+  }
+
+  const user = await User.findById(tokenData.id);
+
+  if (user) {
+    request.user = user;
+  }
+
+  next();
+};
+
+module.exports = { errorHandler, tokenExtractor, userExtractor };
