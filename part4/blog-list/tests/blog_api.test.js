@@ -1,7 +1,10 @@
 const mongoose = require('mongoose');
 const supertest = require('supertest');
+
 const app = require('../app');
 const Blog = require('../models/blog');
+const User = require('../models/user');
+const { getLoginToken } = require('./test_helper');
 
 const api = supertest(app);
 
@@ -26,6 +29,7 @@ const initialBlogs = [
 
 beforeEach(async () => {
   await Blog.deleteMany({});
+  await User.deleteMany({});
 
   const blogObjects = initialBlogs.map((blog) => new Blog(blog));
 
@@ -56,8 +60,11 @@ test('id field is included in the response', async () => {
 test('POST /api/blogs successfully saves', async () => {
   const initialResponse = await api.get('/api/blogs');
 
+  const token = await getLoginToken();
+
   await api
     .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
     .send({
       title: 'Post test',
       author: 'Yuta Yokomizo',
@@ -77,8 +84,11 @@ test('POST /api/blogs successfully saves', async () => {
 });
 
 test('Default value of 0 is added when likes is missing on creating a blog', async () => {
+  const token = await getLoginToken();
+
   const response = await api
     .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
     .send({
       title: 'Missing likes',
       author: 'Yuta Yokomizo',
@@ -90,8 +100,11 @@ test('Default value of 0 is added when likes is missing on creating a blog', asy
 });
 
 test('Missing title or url on new blog returns 400 error', async () => {
+  const token = await getLoginToken();
+
   await api
     .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
     .send({
       author: 'Yuta Yokomizo',
       url: 'https://yutayokomizo.com',
@@ -100,6 +113,7 @@ test('Missing title or url on new blog returns 400 error', async () => {
 
   await api
     .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
     .send({
       title: 'Missing likes',
       author: 'Yuta Yokomizo',
@@ -108,9 +122,25 @@ test('Missing title or url on new blog returns 400 error', async () => {
 });
 
 test('DELETE specific blog works', async () => {
-  const deletingId = '5a422aa71b54a676234d17f8';
+  // create a blog
+  const token = await getLoginToken();
 
-  await api.delete(`/api/blogs/${deletingId}`).expect(204);
+  const createBlogResponse = await api
+    .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
+    .send({
+      title: 'Post test',
+      author: 'Yuta Yokomizo',
+      url: 'https://yutayokomizo.com',
+      likes: 0,
+    });
+
+  const deletingId = createBlogResponse.body.id;
+
+  await api
+    .delete(`/api/blogs/${deletingId}`)
+    .set('Authorization', `Bearer ${token}`)
+    .expect(204);
 
   const blogsInDb = await api.get('/api/blogs');
   const ids = blogsInDb.body.map((blog) => blog.id);

@@ -45,7 +45,10 @@ blogsRouter.delete('/:id', userExtractor, async (request, response) => {
       .json({ error: 'Requested blog does not exist' });
   }
 
-  if (requestedBlog.user.toString() !== request.user._id.toString()) {
+  if (
+    requestedBlog.user &&
+    requestedBlog.user.toString() !== request.user._id.toString()
+  ) {
     return response.status(403).json({ error: 'User invalid' });
   }
 
