@@ -7,6 +7,9 @@ const Blog = ({ blog, afterUpdate }) => {
   const showWhenVisible = { display: detailVisible ? '' : 'none' };
   const hideWhenVisible = { display: detailVisible ? 'none' : '' };
 
+  const loginUser = JSON.parse(window.localStorage.getItem('loginUser'));
+  const isOwner = blog.user && blog.user.username === loginUser.username;
+
   const handleLike = async () => {
     await blogService.update(blog.id, {
       title: blog.title,
@@ -55,7 +58,7 @@ const Blog = ({ blog, afterUpdate }) => {
           {blog.likes} <button onClick={handleLike}>like</button>
         </div>
         <p>{blog.author}</p>
-        <button onClick={handleRemove}>remove</button>
+        {isOwner && <button onClick={handleRemove}>remove</button>}
       </div>
     </div>
   );
