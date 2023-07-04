@@ -83,7 +83,10 @@ const App = () => {
         <div>
           <p>{user.name} logged in</p>
           <button onClick={handleLogout}>logout</button>
-          <CreateBlogForm setSuccessMessage={setSuccessMessage} />
+          <CreateBlogForm
+            setSuccessMessage={setSuccessMessage}
+            afterCreate={setBlogs}
+          />
           {blogs.map((blog) => (
             <Blog key={blog.id} blog={blog} />
           ))}

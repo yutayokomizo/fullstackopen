@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import blogService from '../services/blogs';
 
-const CreateBlogForm = ({ setSuccessMessage }) => {
+const CreateBlogForm = ({ setSuccessMessage, afterCreate }) => {
   const [formVisible, setFormVisible] = useState(false);
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
@@ -21,6 +21,8 @@ const CreateBlogForm = ({ setSuccessMessage }) => {
     setAuthor('');
     setUrl('');
     setFormVisible(false);
+    const blogsAfterCreate = await blogService.getAll();
+    afterCreate(blogsAfterCreate);
   };
 
   return (
