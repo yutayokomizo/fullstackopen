@@ -55,7 +55,12 @@ const App = () => {
           <button type='submit'>login</button>
         </form>
       ) : (
-        blogs.map((blog) => <Blog key={blog.id} blog={blog} />)
+        <div>
+          <p>{user.name} logged in</p>
+          {blogs.map((blog) => (
+            <Blog key={blog.id} blog={blog} />
+          ))}
+        </div>
       )}
     </div>
   );
