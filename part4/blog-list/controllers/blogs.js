@@ -57,10 +57,25 @@ blogsRouter.delete('/:id', userExtractor, async (request, response) => {
   response.status(204).end();
 });
 
-blogsRouter.put('/:id', async (request, response) => {
+blogsRouter.put('/:id', userExtractor, async (request, response) => {
+  const requestedBlog = await Blog.findById(request.params.id);
+  const user = requestedBlog.user;
+
+  if (!requestedBlog) {
+    return response
+      .status(404)
+      .json({ error: 'Requested blog does not exist' });
+  }
+
+  if (user && user.toString() !== request.user._id.toString()) {
+    return response.status(403).json({ error: 'User invalid' });
+  }
+
+  const { title, author, url, likes } = request.body;
+
   const updatedBlog = await Blog.findByIdAndUpdate(
     request.params.id,
-    request.body,
+    { title, author, url, likes, user: user._id },
     { new: true },
   );
 

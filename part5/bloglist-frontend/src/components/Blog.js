@@ -1,10 +1,23 @@
 import { useState } from 'react';
+import blogService from '../services/blogs';
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, afterUpdate }) => {
   const [detailVisible, setDetailVisible] = useState(false);
 
   const showWhenVisible = { display: detailVisible ? '' : 'none' };
   const hideWhenVisible = { display: detailVisible ? 'none' : '' };
+
+  const handleLike = async () => {
+    await blogService.update(blog.id, {
+      title: blog.title,
+      author: blog.author,
+      url: blog.url,
+      likes: blog.likes + 1,
+    });
+
+    const blogs = await blogService.getAll();
+    afterUpdate(blogs);
+  };
 
   return (
     <div
@@ -26,7 +39,7 @@ const Blog = ({ blog }) => {
       <div style={showWhenVisible}>
         <p>{blog.url}</p>
         <div>
-          {blog.likes} <button>like</button>
+          {blog.likes} <button onClick={handleLike}>like</button>
         </div>
         <p>{blog.author}</p>
       </div>
