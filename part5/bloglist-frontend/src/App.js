@@ -13,6 +13,8 @@ const App = () => {
   const [successMessage, setSuccessMessage] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
 
+  const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes);
+
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
   }, []);
@@ -87,7 +89,7 @@ const App = () => {
             setSuccessMessage={setSuccessMessage}
             afterCreate={setBlogs}
           />
-          {blogs.map((blog) => (
+          {sortedBlogs.map((blog) => (
             <Blog key={blog.id} blog={blog} afterUpdate={setBlogs} />
           ))}
         </div>
