@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import PropTypes from 'prop-types';
 import blogService from '../services/blogs';
 
 const Blog = ({ blog, afterUpdate }) => {
@@ -62,6 +63,11 @@ const Blog = ({ blog, afterUpdate }) => {
       </div>
     </div>
   );
+};
+
+Blog.propTypes = {
+  blog: PropTypes.object.isRequired,
+  afterUpdate: PropTypes.func.isRequired,
 };
 
 export default Blog;
