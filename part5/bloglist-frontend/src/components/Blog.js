@@ -44,7 +44,7 @@ const Blog = ({ blog, afterUpdate }) => {
         marginBottom: '4px',
       }}
     >
-      <div>
+      <div className='summary-div'>
         {blog.title} {blog.author}
         <button style={hideWhenVisible} onClick={() => setDetailVisible(true)}>
           view
@@ -53,7 +53,7 @@ const Blog = ({ blog, afterUpdate }) => {
           hide
         </button>
       </div>
-      <div style={showWhenVisible}>
+      <div style={showWhenVisible} className='hidden-div'>
         <p>{blog.url}</p>
         <div>
           {blog.likes} <button onClick={handleLike}>like</button>
