@@ -38,6 +38,7 @@ const Blog = ({ blog, afterUpdate }) => {
 
   return (
     <div
+      className='blog'
       style={{
         border: '1px solid black',
         padding: '4px 10px',
@@ -55,7 +56,7 @@ const Blog = ({ blog, afterUpdate }) => {
       </div>
       <div style={showWhenVisible} className='hidden-div'>
         <p>{blog.url}</p>
-        <div>
+        <div id='like-count'>
           {blog.likes} <button onClick={handleLike}>like</button>
         </div>
         <p>{blog.author}</p>

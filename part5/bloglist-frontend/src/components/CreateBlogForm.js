@@ -37,6 +37,7 @@ const CreateBlogForm = ({ setSuccessMessage, afterCreate }) => {
               value={title}
               onChange={({ target }) => setTitle(target.value)}
               placeholder='title'
+              id='title'
             />
           </div>
           <div>
@@ -46,6 +47,7 @@ const CreateBlogForm = ({ setSuccessMessage, afterCreate }) => {
               value={author}
               onChange={({ target }) => setAuthor(target.value)}
               placeholder='author'
+              id='author'
             />
           </div>
           <div>
@@ -55,13 +57,20 @@ const CreateBlogForm = ({ setSuccessMessage, afterCreate }) => {
               value={url}
               onChange={({ target }) => setUrl(target.value)}
               placeholder='url'
+              id='url'
             />
           </div>
-          <button type='submit'>create</button>
+          <button id='create-button' type='submit'>
+            create
+          </button>
         </form>
         <button onClick={() => setFormVisible(false)}>cancel</button>
       </div>
-      <button style={hideWhenVisible} onClick={() => setFormVisible(true)}>
+      <button
+        id='new-note'
+        style={hideWhenVisible}
+        onClick={() => setFormVisible(true)}
+      >
         new note
       </button>
     </>
