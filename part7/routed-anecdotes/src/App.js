@@ -86,6 +86,12 @@ const CreateNew = (props) => {
     props.onSuccess(`a new anecdote ${content} created!`);
   };
 
+  const handleClickReset = () => {
+    content.reset();
+    author.reset();
+    info.reset();
+  };
+
   return (
     <div>
       <h2>create a new anecdote</h2>
@@ -103,6 +109,9 @@ const CreateNew = (props) => {
           <input {...info} />
         </div>
         <button>create</button>
+        <button type='button' onClick={handleClickReset}>
+          reset
+        </button>
       </form>
     </div>
   );
