@@ -1,36 +1,43 @@
 import { useState } from 'react';
+import { useMutation, useQueryClient } from 'react-query';
 import blogService from '../services/blogs';
 import { useNotificationDispatch } from '../NotificationContext';
 
-const CreateBlogForm = ({ afterCreate }) => {
+const CreateBlogForm = () => {
   const [formVisible, setFormVisible] = useState(false);
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
   const [url, setUrl] = useState('');
   const dispatch = useNotificationDispatch();
+  const queryClient = useQueryClient();
+  const createMutation = useMutation(blogService.create, {
+    onSuccess: (data) => {
+      queryClient.invalidateQueries('blogs');
+      dispatch({
+        type: 'SET',
+        payload: {
+          type: 'success',
+          message: `a new blog ${data.title} by ${data.author} added`,
+        },
+      });
+      setTimeout(() => {
+        dispatch({ type: 'REMOVE' });
+      }, 5000);
+    },
+  });
 
   const hideWhenVisible = { display: formVisible ? 'none' : '' };
   const showWhenVisible = { display: formVisible ? '' : 'none' };
 
   const handleBlogCreate = async (event) => {
     event.preventDefault();
-    const data = await blogService.create({ title, author, url });
-    dispatch({
-      type: 'SET',
-      payload: {
-        type: 'success',
-        message: `a new blog ${data.title} by ${data.author} added`,
-      },
-    });
-    setTimeout(() => {
-      dispatch({ type: 'REMOVE' });
-    }, 5000);
+
+    createMutation.mutate({ title, author, url });
+
     setTitle('');
     setAuthor('');
     setUrl('');
     setFormVisible(false);
-    const blogsAfterCreate = await blogService.getAll();
-    afterCreate(blogsAfterCreate);
   };
 
   return (
