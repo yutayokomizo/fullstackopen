@@ -1,12 +1,33 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from 'react-query';
+import { Routes, Route } from 'react-router-dom';
 import Blog from './components/Blog';
 import blogService from './services/blogs';
-import userService from './services/users';
+import userService from './services/login';
 import Notification from './components/Notification';
 import CreateBlogForm from './components/CreateBlogForm';
 import { useNotificationDispatch } from './NotificationContext';
 import { useLoginUserDispatch, useLoginUserValue } from './LoginUserContext';
+import Users from './components/Users';
+
+const HomeContent = () => {
+  const results = useQuery('blogs', blogService.getAll);
+
+  if (results.isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  const blogs = results.data;
+  const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes);
+  return (
+    <>
+      <CreateBlogForm />
+      {sortedBlogs.map((blog) => (
+        <Blog key={blog.id} blog={blog} />
+      ))}
+    </>
+  );
+};
 
 const App = () => {
   const results = useQuery('blogs', blogService.getAll);
@@ -28,9 +49,6 @@ const App = () => {
   if (results.isLoading) {
     return <div>Loading...</div>;
   }
-
-  const blogs = results.data;
-  const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes);
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -93,10 +111,10 @@ const App = () => {
         <div>
           <p>{userValue.name} logged in</p>
           <button onClick={handleLogout}>logout</button>
-          <CreateBlogForm />
-          {sortedBlogs.map((blog) => (
-            <Blog key={blog.id} blog={blog} />
-          ))}
+          <Routes>
+            <Route path='/' element={<HomeContent />} />
+            <Route path='/users' element={<Users />} />
+          </Routes>
         </div>
       )}
     </div>
