@@ -6,20 +6,22 @@ import userService from './services/users';
 import Notification from './components/Notification';
 import CreateBlogForm from './components/CreateBlogForm';
 import { useNotificationDispatch } from './NotificationContext';
+import { useLoginUserDispatch, useLoginUserValue } from './LoginUserContext';
 
 const App = () => {
   const results = useQuery('blogs', blogService.getAll);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [user, setUser] = useState(null);
   const dispatch = useNotificationDispatch();
+  const userDispatch = useLoginUserDispatch();
+  const userValue = useLoginUserValue();
 
   useEffect(() => {
     const loginUserJSON = window.localStorage.getItem('loginUser');
     if (loginUserJSON) {
       const user = JSON.parse(loginUserJSON);
       blogService.setToken(user.token);
-      setUser(user);
+      userDispatch({ type: 'SET', payload: user });
     }
   }, []);
 
@@ -40,7 +42,7 @@ const App = () => {
       });
       window.localStorage.setItem('loginUser', JSON.stringify(user));
       blogService.setToken(user.token);
-      setUser(user);
+      userDispatch({ type: 'SET', payload: user });
       setUsername('');
       setPassword('');
     } catch (exception) {
@@ -56,14 +58,14 @@ const App = () => {
 
   const handleLogout = () => {
     window.localStorage.removeItem('loginUser');
-    setUser(null);
+    userDispatch({ type: 'REMOVE' });
   };
 
   return (
     <div>
       <h2>blogs</h2>
       <Notification />
-      {user === null ? (
+      {userValue === null ? (
         <form onSubmit={handleLogin}>
           <div>
             username
@@ -89,7 +91,7 @@ const App = () => {
         </form>
       ) : (
         <div>
-          <p>{user.name} logged in</p>
+          <p>{userValue.name} logged in</p>
           <button onClick={handleLogout}>logout</button>
           <CreateBlogForm />
           {sortedBlogs.map((blog) => (
