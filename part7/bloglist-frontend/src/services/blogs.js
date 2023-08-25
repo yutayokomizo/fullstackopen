@@ -22,7 +22,7 @@ const create = async (data) => {
   return request.data;
 };
 
-const update = async (blogId, data) => {
+const update = async ({ blogId, data }) => {
   const config = {
     headers: {
       Authorization: token,

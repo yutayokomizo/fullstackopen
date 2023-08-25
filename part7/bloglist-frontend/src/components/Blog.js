@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
+import { useMutation, useQueryClient } from 'react-query';
 import blogService from '../services/blogs';
 
-const Blog = ({ blog, afterUpdate }) => {
+const Blog = ({ blog }) => {
   const [detailVisible, setDetailVisible] = useState(false);
 
   const showWhenVisible = { display: detailVisible ? '' : 'none' };
@@ -11,16 +12,28 @@ const Blog = ({ blog, afterUpdate }) => {
   const loginUser = JSON.parse(window.localStorage.getItem('loginUser'));
   const isOwner = blog.user && blog.user.username === loginUser.username;
 
-  const handleLike = async () => {
-    await blogService.update(blog.id, {
-      title: blog.title,
-      author: blog.author,
-      url: blog.url,
-      likes: blog.likes + 1,
-    });
+  const queryClient = useQueryClient();
+  const likeMutation = useMutation(blogService.update, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('blogs');
+    },
+  });
+  const removeMutation = useMutation(blogService.remove, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('blogs');
+    },
+  });
 
-    const blogs = await blogService.getAll();
-    afterUpdate(blogs);
+  const handleLike = async () => {
+    likeMutation.mutate({
+      blogId: blog.id,
+      data: {
+        title: blog.title,
+        author: blog.author,
+        url: blog.url,
+        likes: blog.likes + 1,
+      },
+    });
   };
 
   const handleRemove = async () => {
@@ -29,10 +42,7 @@ const Blog = ({ blog, afterUpdate }) => {
     );
 
     if (isApproved) {
-      await blogService.remove(blog.id);
-
-      const blogsAfterRemove = await blogService.getAll();
-      afterUpdate(blogsAfterRemove);
+      removeMutation.mutate(blog.id);
     }
   };
 
