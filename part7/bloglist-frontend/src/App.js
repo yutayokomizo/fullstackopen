@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from 'react-query';
 import { Routes, Route } from 'react-router-dom';
+
 import Blog from './components/Blog';
 import blogService from './services/blogs';
 import userService from './services/login';
@@ -11,6 +12,7 @@ import { useLoginUserDispatch, useLoginUserValue } from './LoginUserContext';
 import Users from './components/Users';
 import UserDetail from './components/UserDetail';
 import BlogDetail from './components/BlogDetail';
+import Navbar from './components/Navbar';
 
 const HomeContent = () => {
   const results = useQuery('blogs', blogService.getAll);
@@ -83,6 +85,7 @@ const App = () => {
 
   return (
     <div>
+      <Navbar user={userValue} handleLogout={handleLogout} />
       <h2>blogs</h2>
       <Notification />
       {userValue === null ? (
@@ -111,8 +114,6 @@ const App = () => {
         </form>
       ) : (
         <div>
-          <p>{userValue.name} logged in</p>
-          <button onClick={handleLogout}>logout</button>
           <Routes>
             <Route path='/' element={<HomeContent />} />
             <Route path='/users' element={<Users />} />
