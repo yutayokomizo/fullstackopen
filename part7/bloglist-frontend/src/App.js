@@ -10,6 +10,7 @@ import { useNotificationDispatch } from './NotificationContext';
 import { useLoginUserDispatch, useLoginUserValue } from './LoginUserContext';
 import Users from './components/Users';
 import UserDetail from './components/UserDetail';
+import BlogDetail from './components/BlogDetail';
 
 const HomeContent = () => {
   const results = useQuery('blogs', blogService.getAll);
@@ -116,6 +117,7 @@ const App = () => {
             <Route path='/' element={<HomeContent />} />
             <Route path='/users' element={<Users />} />
             <Route path='/users/:id' element={<UserDetail />} />
+            <Route path='/blogs/:id' element={<BlogDetail />} />
           </Routes>
         </div>
       )}
