@@ -9,6 +9,7 @@ import CreateBlogForm from './components/CreateBlogForm';
 import { useNotificationDispatch } from './NotificationContext';
 import { useLoginUserDispatch, useLoginUserValue } from './LoginUserContext';
 import Users from './components/Users';
+import UserDetail from './components/UserDetail';
 
 const HomeContent = () => {
   const results = useQuery('blogs', blogService.getAll);
@@ -114,6 +115,7 @@ const App = () => {
           <Routes>
             <Route path='/' element={<HomeContent />} />
             <Route path='/users' element={<Users />} />
+            <Route path='/users/:id' element={<UserDetail />} />
           </Routes>
         </div>
       )}
