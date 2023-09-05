@@ -33,6 +33,14 @@ const update = async ({ blogId, data }) => {
   return request.data;
 };
 
+const comment = async ({ blogId, comment }) => {
+  const request = await axios.post(`${baseUrl}/${blogId}/comments`, {
+    comment: comment,
+  });
+
+  return request.data;
+};
+
 const remove = async (blogId) => {
   const config = {
     headers: {
@@ -44,4 +52,4 @@ const remove = async (blogId) => {
   return request.data;
 };
 
-export default { getAll, create, setToken, update, remove };
+export default { getAll, create, setToken, update, remove, comment };
