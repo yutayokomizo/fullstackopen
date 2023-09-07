@@ -1,6 +1,9 @@
-import { Link } from 'react-router-dom';
+import Navbar from 'react-bootstrap/Navbar';
+import Container from 'react-bootstrap/Container';
+import Nav from 'react-bootstrap/Nav';
+import Button from 'react-bootstrap/Button';
 
-const Navbar = ({ user, handleLogout }) => {
+const NavbarComponent = ({ user, handleLogout }) => {
   const links = [
     {
       to: '/',
@@ -13,27 +16,24 @@ const Navbar = ({ user, handleLogout }) => {
   ];
 
   return (
-    <div
-      style={{
-        backgroundColor: '#ccc',
-        display: 'flex',
-        alignItems: 'center',
-        columnGap: '10px',
-      }}
-    >
-      {links.map((link) => (
-        <Link key={link.to} to={link.to}>
-          {link.text}
-        </Link>
-      ))}
-      {user !== null && (
-        <>
-          <p>{user.name} logged in</p>
-          <button onClick={handleLogout}>Logout</button>
-        </>
-      )}
-    </div>
+    <Navbar>
+      <Container>
+        <Nav>
+          {links.map((link) => (
+            <Nav.Link key={link.to} to={link.to}>
+              {link.text}
+            </Nav.Link>
+          ))}
+        </Nav>
+        {user !== null && (
+          <div className='ms-auto'>
+            <Navbar.Text className='m-2'>{user.name} logged in</Navbar.Text>
+            <Button onClick={handleLogout}>Logout</Button>
+          </div>
+        )}
+      </Container>
+    </Navbar>
   );
 };
 
-export default Navbar;
+export default NavbarComponent;

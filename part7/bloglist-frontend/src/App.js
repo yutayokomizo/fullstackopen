@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from 'react-query';
 import { Routes, Route } from 'react-router-dom';
+import { Table } from 'react-bootstrap';
 
 import Blog from './components/Blog';
 import blogService from './services/blogs';
@@ -26,9 +27,13 @@ const HomeContent = () => {
   return (
     <>
       <CreateBlogForm />
-      {sortedBlogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} />
-      ))}
+      <Table>
+        <tbody>
+          {sortedBlogs.map((blog) => (
+            <Blog key={blog.id} blog={blog} />
+          ))}
+        </tbody>
+      </Table>
     </>
   );
 };
@@ -86,42 +91,44 @@ const App = () => {
   return (
     <div>
       <Navbar user={userValue} handleLogout={handleLogout} />
-      <h2>blogs</h2>
-      <Notification />
-      {userValue === null ? (
-        <form onSubmit={handleLogin}>
+      <div className='container'>
+        <h2>blogs</h2>
+        <Notification />
+        {userValue === null ? (
+          <form onSubmit={handleLogin}>
+            <div>
+              username
+              <input
+                id='username'
+                type='text'
+                value={username}
+                onChange={({ target }) => setUsername(target.value)}
+              />
+            </div>
+            <div>
+              password
+              <input
+                id='password'
+                type='password'
+                value={password}
+                onChange={({ target }) => setPassword(target.value)}
+              />
+            </div>
+            <button id='register' type='submit'>
+              login
+            </button>
+          </form>
+        ) : (
           <div>
-            username
-            <input
-              id='username'
-              type='text'
-              value={username}
-              onChange={({ target }) => setUsername(target.value)}
-            />
+            <Routes>
+              <Route path='/' element={<HomeContent />} />
+              <Route path='/users' element={<Users />} />
+              <Route path='/users/:id' element={<UserDetail />} />
+              <Route path='/blogs/:id' element={<BlogDetail />} />
+            </Routes>
           </div>
-          <div>
-            password
-            <input
-              id='password'
-              type='password'
-              value={password}
-              onChange={({ target }) => setPassword(target.value)}
-            />
-          </div>
-          <button id='register' type='submit'>
-            login
-          </button>
-        </form>
-      ) : (
-        <div>
-          <Routes>
-            <Route path='/' element={<HomeContent />} />
-            <Route path='/users' element={<Users />} />
-            <Route path='/users/:id' element={<UserDetail />} />
-            <Route path='/blogs/:id' element={<BlogDetail />} />
-          </Routes>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
