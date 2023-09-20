@@ -1,6 +1,26 @@
 const { ApolloServer } = require('@apollo/server');
 const { startStandaloneServer } = require('@apollo/server/standalone');
 const { v1: uuid } = require('uuid');
+const mongoose = require('mongoose');
+const Book = require('./models/book');
+const Author = require('./models/author');
+const { GraphQLError } = require('graphql');
+require('dotenv').config();
+
+mongoose.set('strictQuery', true);
+
+const MONGO_URI = process.env.MONGO_URI;
+
+console.log('Connecting to', MONGO_URI);
+
+mongoose
+  .connect(MONGO_URI)
+  .then(() => {
+    console.log('Connected to MongoDB');
+  })
+  .catch((error) => {
+    console.log('Error connecting to MongoDB: ', error.message);
+  });
 
 let authors = [
   {
@@ -102,9 +122,9 @@ const typeDefs = `
   type Book {
     title: String!
     published: Int!
-    author: String!
+    author: Author!
     id: ID!
-    genres: [String]!
+    genres: [String!]!
   }
 
   type Author {
@@ -122,11 +142,15 @@ const typeDefs = `
   }
 
   type Mutation {
+    addAuthor(
+      name: String!
+      born: Int
+    ): Author
     addBook(
       title: String!
       author: String!
       published: Int!
-      genres: [String]!
+      genres: [String!]!
     ): Book
     editAuthor(
       name: String!
@@ -170,17 +194,24 @@ const resolvers = {
     },
   },
   Mutation: {
-    addBook: (root, args) => {
-      const author = args.author;
+    addAuthor: async (root, args) => {
+      const author = new Author({ ...args });
 
-      if (!authors.find((a) => a.name === author)) {
-        // Author not found
-        const newAuthor = { name: author, id: uuid() };
-        authors = authors.concat(newAuthor);
+      await author.save();
+
+      return author;
+    },
+    addBook: async (root, args) => {
+      let author = await Author.findOne({ name: args.author });
+
+      if (!author) {
+        author = new Author({ name: args.author });
+        await author.save();
       }
 
-      const book = { ...args, id: uuid() };
-      books = books.concat(book);
+      const book = new Book({ ...args, author: author._id });
+      await book.save();
+
       return book;
     },
     editAuthor: (root, args) => {
